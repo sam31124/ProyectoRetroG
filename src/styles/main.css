@@ -1,0 +1,23 @@
+body {
+  background-color: #0b0c10;
+  color: #fff;
+  font-family: 'Press Start 2P', cursive;
+  background-image: url('/home/ubuntu/retro-g/public/assets/fondo.jpg');
+  background-size: cover;
+  background-attachment: fixed;
+}
+
+.neon-text {
+  color: #00d8ff;
+  text-shadow: 0 0 5px #00d8ff, 0 0 10px #00d8ff;
+}
+
+.border-neon {
+  border: 2px solid #00d8ff;
+  box-shadow: 0 0 10px #00d8ff;
+}
+
+.neon-title {
+  color: #ff00ff;
+  text-shadow: 0 0 5px #ff00ff, 0 0 10px #ff00ff;
+}
