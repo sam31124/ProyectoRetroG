@@ -1,20 +1,48 @@
 import React from 'react';
 import { useConsoles } from '../../context/ConsoleContext';
 import ConsoleCard from '../molecules/ConsoleCard';
+import '../../styles/main.css';
 
 export default function Home() {
   const { consoles } = useConsoles();
 
   return (
     <div className="text-center">
-      <h1 className="neon-title mb-4">🕹️ Tienda de Consolas Retro</h1>
-      <div className="row">
-        {consoles.map(c => (
-          <div key={c.id} className="col-12 col-sm-6 col-md-4 col-lg-3 mb-3">
-            <ConsoleCard consoleItem={c} />
+      {/* 🔹 Sección de bienvenida */}
+      <section className="container mt-5 mb-5 text-start">
+        <div className="row align-items-center">
+          <div className="col-md-6">
+            <h1 className="neon-title mb-3">
+              Bienvenido a <span className="text-info">RetroG</span>
+            </h1>
+            <p className="lead text-light">
+              Descubre las consolas clásicas que definieron generaciones. Revive la
+              nostalgia con un toque futurista y estilo neón.
+            </p>
+            <button className="btn btn-primary mt-3 border-neon">Ver productos</button>
           </div>
-        ))}
-      </div>
+          <div className="col-md-6 text-center">
+            <img
+              src="/assets/portadatienda.jpg"
+              alt="Tienda Retro"
+              className="img-fluid border-neon"
+              style={{ borderRadius: '10px', maxHeight: '280px', objectFit: 'cover' }}
+            />
+          </div>
+        </div>
+      </section>
+
+      {/* 🔹 Sección de productos */}
+      <section className="container mt-5">
+        <h2 className="neon-title mb-4">Nuestros Productos</h2>
+        <div className="row justify-content-center">
+          {consoles.map(c => (
+            <div key={c.id} className="col-12 col-sm-6 col-md-4 col-lg-3 mb-4">
+              <ConsoleCard consoleItem={c} />
+            </div>
+          ))}
+        </div>
+      </section>
     </div>
   );
 }
