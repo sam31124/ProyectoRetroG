@@ -28,7 +28,8 @@ export function ConsoleProvider({ children }) {
   );
 }
 
-export function useConsoles() {
+export function useConsole() {
   return useContext(ConsoleContext);
 }
+
 

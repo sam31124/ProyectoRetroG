@@ -1,10 +1,10 @@
 import React from 'react';
-import { useConsoles } from '../../context/ConsoleContext';
+import { useConsole } from '../../context/ConsoleContext'; // ✅ Import correcto
 import ConsoleCard from '../molecules/ConsoleCard';
 import '../../styles/main.css';
 
 export default function Home() {
-  const { consoles } = useConsoles();
+  const { consoles } = useConsole(); // ✅ Uso correcto del hook
 
   return (
     <div className="text-center">
@@ -36,7 +36,7 @@ export default function Home() {
       <section className="container mt-5">
         <h2 className="neon-title mb-4">Nuestros Productos</h2>
         <div className="row justify-content-center">
-          {consoles.map(c => (
+          {consoles.map((c) => (
             <div key={c.id} className="col-12 col-sm-6 col-md-4 col-lg-3 mb-4">
               <ConsoleCard consoleItem={c} />
             </div>

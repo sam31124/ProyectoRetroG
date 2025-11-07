@@ -13,6 +13,11 @@ import AdminPanel from './components/pages/AdminPanel';
 import Contacto from './components/pages/Contacto';
 import Navbar from './components/organisms/Navbar';
 import Footer from './components/organisms/Footer';
+import Blogs from './components/pages/Blogs';
+import Registro from './components/pages/Registro';
+import Login from './components/pages/Login';
+
+
 import './styles/main.css';
 
 export default function App() {
@@ -31,7 +36,12 @@ export default function App() {
             <Route path="/exito" element={<CompraExitosa />} />
             <Route path="/error" element={<CompraError />} />
             <Route path="/admin" element={<AdminPanel />} />
+            <Route path="/blogs" element={<Blogs />} />
             <Route path="/contacto" element={<Contacto />} />
+            <Route path="/ofertas" element={<Ofertas />} />
+            <Route path="/admin" element={<AdminPanel />} />
+            <Route path="/registro" element={<Registro />} />
+            <Route path="/login" element={<Login />} />
             
           </Routes>
         </main>
