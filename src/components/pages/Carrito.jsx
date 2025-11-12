@@ -1,104 +1,37 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useCart } from "../../context/CartContext";
 import { readAll } from "../../data/consoles";
 import "../../styles/main.css";
 
 export default function Carrito() {
   const navigate = useNavigate();
-  const [carrito, setCarrito] = useState([]);
+  const { cart, addToCart, removeFromCart, updateQuantity, clearCart } = useCart();
   const [catalogo, setCatalogo] = useState([]);
   const [total, setTotal] = useState(0);
 
-  // 🔹 Cargar catálogo y carrito
+  // 🔹 Cargar catálogo
   useEffect(() => {
     setCatalogo(readAll());
-    const saved = JSON.parse(localStorage.getItem("carrito")) || [];
-    setCarrito(saved);
-    calcularTotal(saved);
   }, []);
 
-  // 🔹 Guardar carrito y recalcular total
+  // 🔹 Calcular total cuando cambie el carrito
   useEffect(() => {
-    localStorage.setItem("carrito", JSON.stringify(carrito));
-    calcularTotal(carrito);
-  }, [carrito]);
-
-  // 🔹 Calcular total
-  const calcularTotal = (items) => {
-    const t = items.reduce(
-      (acc, i) => acc + (Number(i.price) || 0) * (i.cantidad || 1),
+    const nuevoTotal = cart.reduce(
+      (acc, item) => acc + (Number(item.price) || 0) * (item.quantity || 1),
       0
     );
-    setTotal(t);
-  };
+    setTotal(nuevoTotal);
+  }, [cart]);
 
-  // 🔹 Agregar producto (usa name o nombre según exista)
-  const agregarProducto = (p) => {
-    const producto = {
-      id: p.id,
-      name: p.name || p.nombre,
-      price: Number(p.price || p.precio || 0),
-      image: p.image,
-    };
-
-    const existe = carrito.find((item) => item.id === producto.id);
-    let nuevo;
-
-    if (existe) {
-      nuevo = carrito.map((item) =>
-        item.id === producto.id
-          ? { ...item, cantidad: item.cantidad + 1 }
-          : item
-      );
-    } else {
-      nuevo = [...carrito, { ...producto, cantidad: 1 }];
-    }
-
-    setCarrito(nuevo);
-    localStorage.setItem("carrito", JSON.stringify(nuevo));
-    window.dispatchEvent(new Event("storage"));
-    alert(`🎮 ${producto.name} agregado al carrito`);
-  };
-
-  // 🔹 Cambiar cantidad
-  const cambiarCantidad = (id, delta) => {
-    const actualizado = carrito
-      .map((item) =>
-        item.id === id
-          ? { ...item, cantidad: Math.max(1, item.cantidad + delta) }
-          : item
-      )
-      .filter((item) => item.cantidad > 0);
-    setCarrito(actualizado);
-    window.dispatchEvent(new Event("storage"));
-  };
-
-  // 🔹 Eliminar producto
-  const eliminarProducto = (id) => {
-    const nuevo = carrito.filter((i) => i.id !== id);
-    setCarrito(nuevo);
-    window.dispatchEvent(new Event("storage"));
-  };
-
-  // 🔹 Vaciar carrito
-  const vaciarCarrito = () => {
-    setCarrito([]);
-    localStorage.removeItem("carrito");
-    setTotal(0);
-    window.dispatchEvent(new Event("storage"));
-  };
-
-  // 🔹 Comprar (vacía el carrito y guarda pedido)
+  // 🔹 Comprar
   const comprar = () => {
-    if (carrito.length === 0) {
+    if (cart.length === 0) {
       alert("Tu carrito está vacío.");
       return;
     }
-    localStorage.setItem("pedido", JSON.stringify({ carrito, total }));
-    setCarrito([]);
-    localStorage.removeItem("carrito");
-    setTotal(0);
-    window.dispatchEvent(new Event("storage"));
+    localStorage.setItem("pedido", JSON.stringify({ cart, total }));
+    clearCart();
     navigate("/checkout");
   };
 
@@ -126,7 +59,7 @@ export default function Carrito() {
                       <p>${Number(p.price).toLocaleString()}</p>
                       <button
                         className="btn btn-outline-info btn-sm w-100"
-                        onClick={() => agregarProducto(p)}
+                        onClick={() => addToCart(p)} // 🆕 Usa el contexto
                       >
                         Agregar
                       </button>
@@ -142,7 +75,7 @@ export default function Carrito() {
         <div className="col-lg-6">
           <div className="border-neon p-3 bg-dark rounded">
             <h4 className="text-info mb-3">Tu Carrito</h4>
-            {carrito.length === 0 ? (
+            {cart.length === 0 ? (
               <p>No hay productos en el carrito.</p>
             ) : (
               <>
@@ -157,7 +90,7 @@ export default function Carrito() {
                     </tr>
                   </thead>
                   <tbody>
-                    {carrito.map((item) => (
+                    {cart.map((item) => (
                       <tr key={item.id}>
                         <td>{item.name}</td>
                         <td>${item.price.toLocaleString()}</td>
@@ -165,26 +98,26 @@ export default function Carrito() {
                           <div className="d-flex justify-content-center">
                             <button
                               className="btn btn-sm btn-outline-info me-2"
-                              onClick={() => cambiarCantidad(item.id, -1)}
+                              onClick={() => updateQuantity(item.id, -1)}
                             >
                               -
                             </button>
-                            <span>{item.cantidad}</span>
+                            <span>{item.quantity}</span>
                             <button
                               className="btn btn-sm btn-outline-info ms-2"
-                              onClick={() => cambiarCantidad(item.id, 1)}
+                              onClick={() => updateQuantity(item.id, 1)}
                             >
                               +
                             </button>
                           </div>
                         </td>
                         <td>
-                          ${(item.price * item.cantidad).toLocaleString()}
+                          ${(item.price * item.quantity).toLocaleString()}
                         </td>
                         <td>
                           <button
                             className="btn btn-sm btn-danger"
-                            onClick={() => eliminarProducto(item.id)}
+                            onClick={() => removeFromCart(item.id)}
                           >
                             X
                           </button>
@@ -200,7 +133,7 @@ export default function Carrito() {
                   </h5>
                   <button
                     className="btn btn-outline-danger me-2"
-                    onClick={vaciarCarrito}
+                    onClick={clearCart}
                   >
                     Vaciar
                   </button>

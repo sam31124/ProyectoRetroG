@@ -12,8 +12,18 @@ export default function BlogCard({ blog }) {
           alt={blog.titulo}
           className="img-fluid my-3 border-neon rounded"
         />
-        <Button className="btn btn-primary">Ver caso</Button>
+
+        {/* El botón ahora abre el enlace externo */}
+        <a
+          href={blog.enlace}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="btn btn-primary border-neon"
+        >
+          Ver caso
+        </a>
       </div>
     </div>
   );
 }
+

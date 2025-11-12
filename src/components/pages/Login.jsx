@@ -4,76 +4,89 @@ import "../../styles/main.css";
 
 export default function Login() {
   const navigate = useNavigate();
-  const [correo, setCorreo] = useState("");
-  const [password, setPassword] = useState("");
-  const [mensaje, setMensaje] = useState("");
+  const [form, setForm] = useState({
+    correo: "",
+    password: "",
+  });
+  const [error, setError] = useState("");
 
-  const handleLogin = (e) => {
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = (e) => {
     e.preventDefault();
 
-    // Cargar usuarios registrados
-    const usuarios = JSON.parse(localStorage.getItem("usuarios_retroG")) || [];
-
-    console.log("Usuarios guardados:", usuarios); // 👀 que miedo yo me void          para debug
-    console.log("Intento de login:", correo, password);
-
-    // Buscar coincidencia exacta de correo y contraseña
-    const usuario = usuarios.find(
-      (u) => u.correo.trim() === correo.trim() && u.password === password
-    );
-
-    if (!usuario) {
-      setMensaje("Correo o contraseña incorrectos.");
+    if (!form.correo || !form.password) {
+      setError("Por favor, completa todos los campos");
       return;
     }
 
-    // Guardar sesión
-    localStorage.setItem("usuario_activo", JSON.stringify(usuario));
+    const usuarios = JSON.parse(localStorage.getItem("usuarios_retroG")) || [];
+    const usuario = usuarios.find(
+      (u) => u.correo === form.correo && u.password === form.password
+    );
 
-    // Redirigir según el rol
-    if (usuario.rol === "admin") {
+    if (!usuario) {
+      setError("Correo o contraseña incorrectos");
+      return;
+    }
+
+    // ✅ Guardar sesión del usuario
+    localStorage.setItem("usuarioActivo", JSON.stringify(usuario));
+
+    // 🔹 Verificar si es administrador (correo @profesor.cl)
+    if (form.correo.endsWith("@profesor.cl")) {
+      alert(`👨‍🏫 Bienvenido Administrador, ${usuario.nombre || "Profesor"}!`);
       navigate("/admin");
     } else {
+      alert(`🎮 Bienvenido, ${usuario.nombre || "Jugador"}!`);
       navigate("/");
     }
   };
 
   return (
     <div className="container mt-5 text-light">
-      <h2 className="text-center mb-4 neon-title"> Iniciar Sesión</h2>
-
+      <h2 className="neon-title text-center mb-4">🎮 Iniciar Sesión</h2>
       <form
-        onSubmit={handleLogin}
-        className="p-4 border-neon rounded-3 shadow-lg bg-dark"
-        style={{ maxWidth: "500px", margin: "0 auto" }}
+        onSubmit={handleSubmit}
+        className="border-neon p-4 bg-dark rounded mx-auto"
+        style={{ maxWidth: "400px" }}
       >
+        {error && <p className="text-danger text-center">{error}</p>}
         <div className="mb-3">
-          <label className="form-label">Correo electrónico</label>
+          <label className="form-label">Correo</label>
           <input
             type="email"
+            name="correo"
+            value={form.correo}
+            onChange={handleChange}
             className="form-control"
-            value={correo}
-            onChange={(e) => setCorreo(e.target.value)}
+            placeholder="tuemail@ejemplo.com"
           />
         </div>
-
         <div className="mb-3">
           <label className="form-label">Contraseña</label>
           <input
             type="password"
+            name="password"
+            value={form.password}
+            onChange={handleChange}
             className="form-control"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            placeholder="********"
           />
         </div>
-
-        {mensaje && <div className="alert alert-danger mt-3">{mensaje}</div>}
-
-        <button type="submit" className="btn btn-success w-100 mt-3 border-neon">
-          Iniciar sesión
-        </button>
+        <button className="btn btn-info w-100">Iniciar sesión</button>
+        <p className="mt-3 text-center">
+          ¿No tienes cuenta?{" "}
+          <span
+            onClick={() => navigate("/registro")}
+            style={{ color: "#00d8ff", cursor: "pointer" }}
+          >
+            Regístrate aquí
+          </span>
+        </p>
       </form>
     </div>
   );
 }
-

@@ -1,48 +1,100 @@
-import React, { useState } from 'react';
-import { useConsole } from '../../context/ConsoleContext';
-import Button from '../atoms/Button';
-import '../../styles/main.css';
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import * as consolesApi from "../../data/consoles";
+import "../../styles/main.css";
+
+// Importar componentes del panel admin
+import Dashboard from "../admin/Dashboard";
+import ProductosAdmin from "../admin/ProductosAdmin";
+import CategoriasAdmin from "../admin/Categorias";
+import UsuariosAdmin from "../admin/Usuarios";
+import ReportesAdmin from "../admin/Reportes";
+import PerfilAdmin from "../admin/Perfil";
+
 
 export default function AdminPanel() {
-  const { consoles } = useConsole();
-  const [productos, setProductos] = useState(consoles);
+  const navigate = useNavigate();
+  const [usuario, setUsuario] = useState(null);
+  const [vista, setVista] = useState("dashboard");
+  const [consolas, setConsolas] = useState([]);
 
-  const eliminarProducto = (id) => {
-    setProductos(productos.filter((p) => p.id !== id));
+  useEffect(() => {
+    const user = JSON.parse(localStorage.getItem("usuarioActivo"));
+    if (!user || !user.correo.endsWith("@profesor.cl")) {
+      alert("Acceso denegado. Solo administradores pueden ingresar.");
+      navigate("/login");
+      return;
+    }
+    setUsuario(user);
+    setConsolas(consolesApi.readAll());
+  }, [navigate]);
+
+  const handleLogout = () => {
+    localStorage.removeItem("usuarioActivo");
+    navigate("/");
+  };
+
+  const renderVista = () => {
+    switch (vista) {
+      case "dashboard":
+        return <Dashboard />;
+      case "productos":
+        return <ProductosAdmin consolas={consolas} />;
+      case "categorias":
+        return <CategoriasAdmin consolas={consolas} />;
+      case "usuarios":
+        return <UsuariosAdmin />;
+      case "reportes":
+        return <ReportesAdmin consolas={consolas} />;
+      case "perfil":
+        return <PerfilAdmin usuario={usuario} />;
+      default:
+        return <Dashboard />;
+    }
   };
 
   return (
-    <div className="container py-5 text-light">
-      <h1 className="neon-title text-center mb-4">Panel de Administración</h1>
-      <table className="table table-dark table-striped border-neon">
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Nombre</th>
-            <th>Marca</th>
-            <th>Precio</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
-          {productos.map((p) => (
-            <tr key={p.id}>
-              <td>{p.id}</td>
-              <td>{p.name}</td>
-              <td>{p.brand}</td>
-              <td>${p.price}</td>
-              <td>
-                <Button
-                  className="btn btn-danger btn-sm"
-                  onClick={() => eliminarProducto(p.id)}
+    <div className="container-fluid mt-4 text-light">
+      <div className="row">
+        {/* Sidebar */}
+        <div className="col-md-3 col-lg-2 bg-dark border-neon p-3 rounded">
+          <h4 className="text-info mb-4">⚙️ Panel Admin</h4>
+          <ul className="list-group list-group-flush">
+            <li className="list-group-item bg-dark border-0 p-0">
+              {[
+                ["🏠 Dashboard", "dashboard"],
+                ["🎮 Productos", "productos"],
+                ["🗂️ Categorías", "categorias"],
+                ["👤 Usuarios", "usuarios"],
+                ["📊 Reportes", "reportes"],
+                ["⚙️ Perfil", "perfil"],
+              ].map(([label, key]) => (
+                <button
+                  key={key}
+                  className="btn btn-outline-info w-100 mb-2"
+                  onClick={() => setVista(key)}
                 >
-                  Eliminar
-                </Button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+                  {label}
+                </button>
+              ))}
+              <button
+                className="btn btn-danger w-100 mt-3"
+                onClick={handleLogout}
+              >
+                🚪 Cerrar sesión
+              </button>
+            </li>
+          </ul>
+        </div>
+
+        {/* Contenido principal */}
+        <div className="col-md-9 col-lg-10">
+          <h2 className="neon-title text-center mb-4">
+            Bienvenido, {usuario?.nombre || "Administrador"}
+          </h2>
+          {renderVista()}
+        </div>
+      </div>
     </div>
   );
 }

@@ -10,17 +10,44 @@ export default function Checkout() {
     direccion: "",
     correo: "",
   });
+  const [mensaje, setMensaje] = useState({ tipo: "", texto: "" });
+  const [isDisabled, setIsDisabled] = useState(true);
 
-  // 🔹 Cargar datos del pedido guardado en localStorage
+  // 🔹 Cargar datos del carrito o pedido desde localStorage
   useEffect(() => {
-    const data = JSON.parse(localStorage.getItem("pedido")) || {
-      carrito: [],
-      total: 0,
-    };
-    setPedido(data);
+    // Busca primero "pedido", si no hay, usa "carrito"
+    const pedidoGuardado = JSON.parse(localStorage.getItem("pedido"));
+    const carritoGuardado = JSON.parse(localStorage.getItem("carrito"));
+
+    if (pedidoGuardado && Array.isArray(pedidoGuardado.carrito)) {
+      setPedido(pedidoGuardado);
+    } else if (Array.isArray(carritoGuardado) && carritoGuardado.length > 0) {
+      const total = carritoGuardado.reduce(
+        (acc, item) =>
+          acc + Number(item.price || 0) * Number(item.cantidad || 1),
+        0
+      );
+      const nuevoPedido = { carrito: carritoGuardado, total };
+      setPedido(nuevoPedido);
+      localStorage.setItem("pedido", JSON.stringify(nuevoPedido));
+    } else {
+      setPedido({ carrito: [], total: 0 });
+    }
   }, []);
 
-  // 🔹 Manejo de cambios en formulario
+  // 🔹 Validar correo y campos
+  useEffect(() => {
+    const correoRegex = /@(gmail|profesor)\.[a-zA-Z]+$/i;
+    const correoValido = correoRegex.test(cliente.correo);
+
+    const camposCompletos =
+      cliente.nombre.trim() !== "" && cliente.direccion.trim() !== "";
+
+    const carritoLleno = pedido.carrito && pedido.carrito.length > 0;
+
+    setIsDisabled(!(correoValido && camposCompletos && carritoLleno));
+  }, [cliente, pedido]);
+
   const handleChange = (e) => {
     setCliente({
       ...cliente,
@@ -28,27 +55,39 @@ export default function Checkout() {
     });
   };
 
-  // 🔹 Simular compra
+  // 🔹 Confirmar compra
   const handleCompra = () => {
-    if (!cliente.nombre || !cliente.direccion || !cliente.correo) {
-      alert("Por favor completa todos los datos del cliente.");
-      return;
-    }
+    if (isDisabled) return;
 
-    if (pedido.total === 0 || pedido.carrito.length === 0) {
-      navigate("/error");
-      return;
-    }
-
-    // Simulación de compra exitosa
     localStorage.removeItem("carrito");
     localStorage.removeItem("pedido");
-    navigate("/exito", { state: { cliente, pedido } });
+
+    setMensaje({
+      tipo: "exito",
+      texto: "Compra realizada con éxito 🎉 Redirigiendo...",
+    });
+
+    setTimeout(() => {
+      navigate("/exito", { state: { cliente, pedido } });
+    }, 1500);
   };
+
+  const correoRegex = /@(gmail|profesor)\.[a-zA-Z]+$/i;
 
   return (
     <div className="container mt-5 text-light">
       <h2 className="neon-title text-center mb-4">🧾 Checkout</h2>
+
+      {/* 🔹 Mensaje visual */}
+      {mensaje.texto && (
+        <div
+          className={`alert-neon ${
+            mensaje.tipo === "error" ? "error" : "exito"
+          }`}
+        >
+          {mensaje.texto}
+        </div>
+      )}
 
       {/* 🔹 Datos del cliente */}
       <div className="border-neon bg-dark p-4 rounded mb-4">
@@ -83,9 +122,19 @@ export default function Checkout() {
               name="correo"
               value={cliente.correo}
               onChange={handleChange}
-              className="form-control"
+              className={`form-control ${
+                cliente.correo && !correoRegex.test(cliente.correo)
+                  ? "is-invalid"
+                  : ""
+              }`}
               placeholder="tuemail@ejemplo.com"
             />
+            {cliente.correo && !correoRegex.test(cliente.correo) && (
+              <small className="text-danger">
+                Solo se permiten correos con dominios Gmail o Profesor (ej:
+                @gmail.cl, @gmail.com, @profesor.cl)
+              </small>
+            )}
           </div>
         </div>
       </div>
@@ -129,10 +178,13 @@ export default function Checkout() {
             Total: ${Number(pedido.total || 0).toLocaleString()}
           </h5>
           <button
-            className="btn btn-success border-neon mt-3"
+            className={`btn ${
+              isDisabled ? "btn-secondary" : "btn-success border-neon"
+            } mt-3`}
             onClick={handleCompra}
+            disabled={isDisabled}
           >
-            Confirmar compra
+            {isDisabled ? "Completa tus datos" : "Confirmar compra"}
           </button>
         </div>
       </div>

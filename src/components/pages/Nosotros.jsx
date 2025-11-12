@@ -17,7 +17,7 @@ export default function Nosotros() {
       <h3 className="fw-bold mt-5 mb-4">Los Desarrolladores</h3>
       <div className="row justify-content-center">
         <div className="col-md-3 m-2 card-dev">
-          <h5 className="fw-bold">Samuel Urzua</h5>
+          <h5 className="fw-bold">Samuelito Urzua</h5>
           <p>Encargado de la integración y funcionalidad con JavaScript.</p>
         </div>
         <div className="col-md-3 m-2 card-dev">

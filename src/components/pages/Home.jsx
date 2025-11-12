@@ -1,10 +1,12 @@
 import React from 'react';
-import { useConsole } from '../../context/ConsoleContext'; // ✅ Import correcto
+import { useConsole } from '../../context/ConsoleContext';
+import { useNavigate } from 'react-router-dom';
 import ConsoleCard from '../molecules/ConsoleCard';
 import '../../styles/main.css';
 
 export default function Home() {
-  const { consoles } = useConsole(); // ✅ Uso correcto del hook
+  const { consoles } = useConsole();
+  const navigate = useNavigate();
 
   return (
     <div className="text-center">
@@ -19,7 +21,12 @@ export default function Home() {
               Descubre las consolas clásicas que definieron generaciones. Revive la
               nostalgia con un toque futurista y estilo neón.
             </p>
-            <button className="btn btn-primary mt-3 border-neon">Ver productos</button>
+            <button
+              className="btn btn-primary mt-3 border-neon"
+              onClick={() => navigate('/productos')} // 👈 Ajusta esta ruta si tus productos están en otra página
+            >
+              Ver productos
+            </button>
           </div>
           <div className="col-md-6 text-center">
             <img
@@ -46,3 +53,4 @@ export default function Home() {
     </div>
   );
 }
+

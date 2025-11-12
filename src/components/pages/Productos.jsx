@@ -1,9 +1,11 @@
 import React from "react";
 import { readAll } from "../../data/consoles";
+import { useCart } from "../../context/CartContext"; // 🆕 import del contexto global
 import "../../styles/main.css";
 
 export default function Productos() {
   const productos = readAll();
+  const { addToCart } = useCart(); // 🆕 obtener método del contexto
 
   const agregarAlCarrito = (p) => {
     const producto = {
@@ -29,12 +31,13 @@ export default function Productos() {
 
     localStorage.setItem("carrito", JSON.stringify(nuevo));
     window.dispatchEvent(new Event("storage"));
+    addToCart(producto); // 🆕 sincroniza también con el contexto global
     alert(`🎮 ${producto.name} agregado al carrito`);
   };
 
   return (
     <div className="container mt-5 text-light">
-      <h2 className="neon-title text-center mb-4">🎮 Nuestros Productos</h2>
+      <h2 className="neon-title text-center mb-4">Nuestros Productos</h2>
       <div className="row">
         {productos.map((p) => (
           <div key={p.id} className="col-6 col-md-4 col-lg-3 mb-4">

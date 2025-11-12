@@ -1,6 +1,5 @@
 const STORAGE_KEY = 'retro_consoles_v1';
 
-
 const sampleConsoles = [
   {
     id: '1',
@@ -29,8 +28,41 @@ const sampleConsoles = [
     brand: 'Nintendo',
     price: 89990,
     image: '/assets/products/vb.png'
+  },
+  {
+    id: '5',
+    name: 'Game Boy Color',
+    brand: 'Nintendo',
+    price: 49990,
+    image: '/assets/products/gmbcolor.avif'
+  },
+  {
+    id: '6',
+    name: 'Game Boy Advance',
+    brand: 'Nintendo',
+    price: 59990,
+    image: '/assets/products/gmbadv.jpg'
+  },
+  {
+    id: '7',
+    name: 'Nintendo GameCube',
+    brand: 'Nintendo',
+    price: 89990,
+    image: '/assets/products/gmcb.avif'
+  },
+  {
+    id: '8',
+    name: 'Nintendo Wii',
+    brand: 'Nintendo',
+    price: 49990,
+    image: '/assets/products/wii.png'
   }
 ];
+// 🔹 Forzar recarga de datos solo si hay menos de 8 consolas guardadas
+const storedData = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+if (storedData.length < 8) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(sampleConsoles));
+}
 
 export function readAll() {
   const stored = localStorage.getItem(STORAGE_KEY);
@@ -70,54 +102,5 @@ export function remove(id) {
   consoles = consoles.filter(c => c.id !== id);
   localStorage.setItem(STORAGE_KEY, JSON.stringify(consoles));
 }
-export const consolesData = [
-  {
-    id: 1,
-    nombre: 'Nintendo NES',
-    precio: 79990,
-    imagen: '/assets/products/nes.jpg'
-  },
-  {
-    id: 2,
-    nombre: 'Super Nintendo (SNES)',
-    precio: 99990,
-    imagen: '/assets/products/snes.jpg'
-  },
-  {
-    id: 3,
-    nombre: 'Nintendo 64',
-    precio: 119990,
-    imagen: '/assets/products/n64.avif'
-  },
-  {
-    id: 4,
-    nombre: 'Virtual Boy',
-    precio: 89990,
-    imagen: '/assets/products/vb.png'
-  },
-  {
-    id: 5,
-    nombre: 'Game Boy Color',
-    precio: 49990,
-    imagen: '/assets/products/gmbcolor.avif'
-  },
-  {
-    id: 6,
-    nombre: 'Game Boy Advance',
-    precio: 59990,
-    imagen: '/assets/products/gmbadv.jpg'
-  },
-  {
-    id: 7,
-    nombre: 'Nintendo GameCube',
-    precio: 89990,
-    imagen: '/assets/products/gmcb.avif'
-  },
-  {
-    id: 8,
-    nombre: 'Nintendo Wii',
-    precio: 49990,
-    imagen: '/assets/products/wii.png'
-  }
-];
+
 

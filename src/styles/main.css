@@ -257,5 +257,43 @@ body::before {
   color: #333333; /* 🔹 Texto gris oscuro, más suave que el negro */
 }
 
+/* 🌟 Mensajes de error y éxito tipo neón */
+.alert-neon {
+  padding: 1rem;
+  border-radius: 10px;
+  text-align: center;
+  font-weight: bold;
+  margin-top: 15px;
+  animation: aparecer 0.4s ease-in-out;
+  box-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
+}
+
+.alert-neon.error {
+  background: rgba(255, 50, 50, 0.15);
+  border: 2px solid #ff4444;
+  color: #ff7777;
+  box-shadow: 0 0 20px #ff4444;
+  text-shadow: 0 0 5px #ff4444;
+}
+
+.alert-neon.exito {
+  background: rgba(50, 255, 100, 0.15);
+  border: 2px solid #00ff99;
+  color: #00ffcc;
+  box-shadow: 0 0 20px #00ffcc;
+  text-shadow: 0 0 5px #00ffcc;
+}
+
+/* ✨ Animación de aparición suave */
+@keyframes aparecer {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
 
 
