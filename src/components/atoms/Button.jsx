@@ -1,28 +1,12 @@
-import React from 'react';
-import Button from '../atoms/Button';
+import React from "react";
 
-export default function BlogCard({ blog }) {
+export default function Button({ text, onClick, className = "", children }) {
   return (
-    <div className="card bg-dark text-light border-neon h-100">
-      <div className="card-body">
-        <h4 className="card-title">{blog.titulo}</h4>
-        <p className="card-text">{blog.descripcion}</p>
-
-        <img
-          src={blog.imagen}
-          alt={blog.titulo}
-          className="img-fluid my-3 border-neon rounded"
-        />
-
-        {/* Aquí usamos tu botón personalizado */}
-        <Button
-          className="btn btn-primary border-neon"
-          onClick={() => window.open(blog.enlace, '_blank', 'noopener,noreferrer')}
-        >
-          Ver caso 
-        </Button>
-      </div>
-    </div>
+    <button
+      className={`btn ${className}`}
+      onClick={onClick}
+    >
+      {text || children}
+    </button>
   );
 }
-

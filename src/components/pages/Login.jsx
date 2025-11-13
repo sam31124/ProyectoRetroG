@@ -32,10 +32,10 @@ export default function Login() {
       return;
     }
 
-    // ✅ Guardar sesión del usuario
+    // Guardar sesión del usuario
     localStorage.setItem("usuarioActivo", JSON.stringify(usuario));
 
-    // 🔹 Verificar si es administrador (correo @profesor.cl)
+    // Verificar si es administrador (correo @profesor.cl)
     if (form.correo.endsWith("@profesor.cl")) {
       alert(`👨‍🏫 Bienvenido Administrador, ${usuario.nombre || "Profesor"}!`);
       navigate("/admin");
@@ -47,7 +47,7 @@ export default function Login() {
 
   return (
     <div className="container mt-5 text-light">
-      <h2 className="neon-title text-center mb-4">🎮 Iniciar Sesión</h2>
+      <h2 className="neon-title text-center mb-4"> Iniciar Sesión</h2>
       <form
         onSubmit={handleSubmit}
         className="border-neon p-4 bg-dark rounded mx-auto"

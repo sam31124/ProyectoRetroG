@@ -10,12 +10,12 @@ export default function Carrito() {
   const [catalogo, setCatalogo] = useState([]);
   const [total, setTotal] = useState(0);
 
-  // 🔹 Cargar catálogo
+  // Cargar catálogo
   useEffect(() => {
     setCatalogo(readAll());
   }, []);
 
-  // 🔹 Calcular total cuando cambie el carrito
+  // Calcular total cuando cambie el carrito
   useEffect(() => {
     const nuevoTotal = cart.reduce(
       (acc, item) => acc + (Number(item.price) || 0) * (item.quantity || 1),
@@ -24,7 +24,7 @@ export default function Carrito() {
     setTotal(nuevoTotal);
   }, [cart]);
 
-  // 🔹 Comprar
+  // Comprar
   const comprar = () => {
     if (cart.length === 0) {
       alert("Tu carrito está vacío.");
@@ -40,7 +40,7 @@ export default function Carrito() {
       <h2 className="neon-title mb-4 text-center">🕹️ Carrito de Compras</h2>
 
       <div className="row">
-        {/* 🔹 Catálogo */}
+        {/* Catálogo */}
         <div className="col-lg-6 mb-4">
           <div className="border-neon p-3 bg-dark rounded">
             <h4 className="text-info mb-3">Catálogo</h4>
@@ -71,7 +71,7 @@ export default function Carrito() {
           </div>
         </div>
 
-        {/* 🔹 Carrito */}
+        {/* Carrito */}
         <div className="col-lg-6">
           <div className="border-neon p-3 bg-dark rounded">
             <h4 className="text-info mb-3">Tu Carrito</h4>

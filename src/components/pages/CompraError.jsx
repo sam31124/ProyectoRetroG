@@ -13,7 +13,7 @@ export default function CompraError() {
           "radial-gradient(circle at center, rgba(30,30,30,1) 0%, rgba(10,10,10,1) 100%)",
       }}
     >
-      <h1 className="neon-title text-danger mb-4">❌ Error en la compra</h1>
+      <h1 className="neon-title text-danger mb-4"> Error en la compra</h1>
       <p className="fs-5 text-center" style={{ maxWidth: "500px" }}>
         Ocurrió un problema al procesar tu compra.  
         Es posible que tu carrito esté vacío o los datos del cliente no sean válidos.
@@ -24,13 +24,13 @@ export default function CompraError() {
           className="btn btn-outline-info me-3 border-neon"
           onClick={() => navigate("/carrito")}
         >
-          🛒 Volver al carrito
+           Volver al carrito
         </button>
         <button
           className="btn btn-outline-light border-neon"
           onClick={() => navigate("/")}
         >
-          🏠 Ir al inicio
+           Ir al inicio
         </button>
       </div>
     </div>

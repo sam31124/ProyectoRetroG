@@ -13,7 +13,7 @@ export default function Checkout() {
   const [mensaje, setMensaje] = useState({ tipo: "", texto: "" });
   const [isDisabled, setIsDisabled] = useState(true);
 
-  // 🔹 Cargar datos del carrito o pedido desde localStorage
+  // Cargar datos del carrito o pedido desde localStorage
   useEffect(() => {
     // Busca primero "pedido", si no hay, usa "carrito"
     const pedidoGuardado = JSON.parse(localStorage.getItem("pedido"));
@@ -35,7 +35,7 @@ export default function Checkout() {
     }
   }, []);
 
-  // 🔹 Validar correo y campos
+  // Validar correo y campos
   useEffect(() => {
     const correoRegex = /@(gmail|profesor)\.[a-zA-Z]+$/i;
     const correoValido = correoRegex.test(cliente.correo);
@@ -55,7 +55,7 @@ export default function Checkout() {
     });
   };
 
-  // 🔹 Confirmar compra
+  // Confirmar compra
   const handleCompra = () => {
     if (isDisabled) return;
 
@@ -78,7 +78,7 @@ export default function Checkout() {
     <div className="container mt-5 text-light">
       <h2 className="neon-title text-center mb-4">🧾 Checkout</h2>
 
-      {/* 🔹 Mensaje visual */}
+      {/* Mensaje visual */}
       {mensaje.texto && (
         <div
           className={`alert-neon ${
@@ -89,7 +89,7 @@ export default function Checkout() {
         </div>
       )}
 
-      {/* 🔹 Datos del cliente */}
+      {/* Datos del cliente */}
       <div className="border-neon bg-dark p-4 rounded mb-4">
         <h4 className="text-info mb-3">Datos del cliente</h4>
         <div className="row">
@@ -139,7 +139,7 @@ export default function Checkout() {
         </div>
       </div>
 
-      {/* 🔹 Resumen del pedido */}
+      {/* Resumen del pedido */}
       <div className="border-neon bg-dark p-4 rounded">
         <h4 className="text-info mb-3">Resumen del pedido</h4>
 

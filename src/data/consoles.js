@@ -6,59 +6,68 @@ const sampleConsoles = [
     name: 'Nintendo NES',
     brand: 'Nintendo',
     price: 79990,
-    image: '/assets/products/nes.jpg'
+    image: '/assets/products/nes.jpg',
+    description: 'La consola que revolucionó los videojuegos en los 80. Icono absoluto retro.'
   },
   {
     id: '2',
     name: 'Super Nintendo (SNES)',
     brand: 'Nintendo',
     price: 99990,
-    image: '/assets/products/snes.jpg'
+    image: '/assets/products/snes.jpg',
+    description: 'La clásica consola de 16 bits con títulos legendarios como Mario World y Donkey Kong Country.'
   },
   {
     id: '3',
     name: 'Nintendo 64',
     brand: 'Nintendo',
     price: 119990,
-    image: '/assets/products/n64.avif'
+    image: '/assets/products/n64.avif',
+    description: 'La primera consola 3D real de Nintendo. Mario 64, Zelda Ocarina of Time y más.'
   },
   {
     id: '4',
     name: 'Virtual Boy',
     brand: 'Nintendo',
     price: 89990,
-    image: '/assets/products/vb.png'
+    image: '/assets/products/vb.png',
+    description: 'La consola portátil experimental en 3D. Un clásico extraño coleccionable.'
   },
   {
     id: '5',
     name: 'Game Boy Color',
     brand: 'Nintendo',
     price: 49990,
-    image: '/assets/products/gmbcolor.avif'
+    image: '/assets/products/gmbcolor.avif',
+    description: 'La legendaria consola portátil que marcó a toda una generación.'
   },
   {
     id: '6',
     name: 'Game Boy Advance',
     brand: 'Nintendo',
     price: 59990,
-    image: '/assets/products/gmbadv.jpg'
+    image: '/assets/products/gmbadv.jpg',
+    description: 'Una de las mejores portátiles de la historia, con catálogo enorme.'
   },
   {
     id: '7',
     name: 'Nintendo GameCube',
     brand: 'Nintendo',
     price: 89990,
-    image: '/assets/products/gmcb.avif'
+    image: '/assets/products/gmcb.avif',
+    description: 'Consola compacta y poderosa con grandes clásicos como Smash Bros Melee.'
   },
   {
     id: '8',
     name: 'Nintendo Wii',
     brand: 'Nintendo',
     price: 49990,
-    image: '/assets/products/wii.png'
+    image: '/assets/products/wii.png',
+    description: 'La consola familiar por excelencia. Movimiento, diversión y nostalgia.'
   }
 ];
-// 🔹 Forzar recarga de datos solo si hay menos de 8 consolas guardadas
+
+// 🔹 Mantener carga inicial en localStorage
 const storedData = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
 if (storedData.length < 8) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(sampleConsoles));
@@ -102,5 +111,3 @@ export function remove(id) {
   consoles = consoles.filter(c => c.id !== id);
   localStorage.setItem(STORAGE_KEY, JSON.stringify(consoles));
 }
-
-

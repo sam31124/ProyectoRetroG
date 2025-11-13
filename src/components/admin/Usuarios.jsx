@@ -5,29 +5,34 @@ export default function UsuariosAdmin() {
 
   return (
     <div>
-      <h4 className="text-info mb-3">Usuarios Registrados</h4>
+      <h4 className="neon-title mb-3 text-center">👥 Usuarios Registrados</h4>
 
       {usuarios.length === 0 ? (
-        <p>No hay usuarios registrados.</p>
+        <p className="text-light text-center">No hay usuarios registrados.</p>
       ) : (
-        <table className="table table-dark table-striped align-middle">
-          <thead>
+        <table className="table table-dark table-striped table-bordered border-neon align-middle">
+          <thead className="bg-dark">
             <tr>
-              <th>Nombre</th>
-              <th>Correo</th>
-              <th>Rol</th>
+              <th className="text-info">Nombre</th>
+              <th className="text-info">Correo</th>
+              <th className="text-info">Rol</th>
             </tr>
           </thead>
+
           <tbody>
             {usuarios.map((u, i) => (
               <tr key={i}>
-                <td>{u.nombre}</td>
-                <td>{u.correo}</td>
+                <td className="text-light">{u.nombre}</td>
+                <td className="text-light">{u.correo}</td>
                 <td>
                   {u.rol === "admin" ? (
-                    <span className="text-warning fw-bold">Administrador</span>
+                    <span className="badge bg-warning text-dark px-3 py-2">
+                      Admin
+                    </span>
                   ) : (
-                    <span className="text-info">Cliente</span>
+                    <span className="badge bg-info text-dark px-3 py-2">
+                      Cliente
+                    </span>
                   )}
                 </td>
               </tr>

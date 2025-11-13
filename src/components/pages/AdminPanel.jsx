@@ -31,6 +31,7 @@ export default function AdminPanel() {
 
   const handleLogout = () => {
     localStorage.removeItem("usuarioActivo");
+    window.dispatchEvent(new Event("storage")); //  fuerza actualización del Navbar
     navigate("/");
   };
 

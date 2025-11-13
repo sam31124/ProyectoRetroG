@@ -1,8 +1,31 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useEffect, useState } from 'react'; 
+import { Link, useNavigate } from 'react-router-dom';
 import '../../styles/main.css';
 
 export default function Navbar() {
+  const navigate = useNavigate();
+  const [usuario, setUsuario] = useState(null);
+
+  // 💫 Actualiza el estado al montar y cuando cambie el localStorage
+  useEffect(() => {
+    const handleStorageChange = () => {
+      const user = JSON.parse(localStorage.getItem("usuarioActivo"));
+      setUsuario(user);
+    };
+
+    handleStorageChange(); // carga inicial
+    window.addEventListener("storage", handleStorageChange);
+    return () => window.removeEventListener("storage", handleStorageChange);
+  }, []);
+
+  const esAdmin = usuario?.correo?.endsWith("@profesor.cl");
+
+  const handleLogout = () => {
+    localStorage.removeItem("usuarioActivo");
+    window.dispatchEvent(new Event("storage"));
+    navigate("/login");
+  };
+
   return (
     <nav className="navbar navbar-expand-lg navbar-dark bg-dark px-4">
       <Link to="/" className="navbar-brand text-info fw-bold">
@@ -35,20 +58,43 @@ export default function Navbar() {
           <li className="nav-item">
             <Link to="/contacto" className="nav-link">Contacto</Link>
           </li>
-          <li className="nav-item"><Link to="/ofertas" className="nav-link">Ofertas</Link></li>
-
+          <li className="nav-item">
+            <Link to="/ofertas" className="nav-link">Ofertas</Link>
+          </li>
         </ul>
 
         <ul className="navbar-nav">
-          <li className="nav-item">
-            <Link to="/login" className="nav-link">Ingresar</Link>
-          </li>
-          <li className="nav-item">
-            <Link to="/registro" className="nav-link">Registro</Link>
-          </li>
+          {/* 💖 Si NO hay usuario logueado, mostramos Ingresar/Registro */}
+          {!usuario && (
+            <>
+              <li className="nav-item">
+                <Link to="/login" className="nav-link">Ingresar</Link>
+              </li>
+              <li className="nav-item">
+                <Link to="/registro" className="nav-link">Registro</Link>
+              </li>
+            </>
+          )}
+
+          {/* 💼 Si es admin, mostramos acceso al panel */}
+          {esAdmin && (
+            <li className="nav-item">
+              <Link to="/admin" className="nav-link text-warning">Panel Admin</Link>
+            </li>
+          )}
+
+          {/* 🚪 Si hay usuario, mostramos botón de cerrar sesión */}
+          {usuario && (
+            <li className="nav-item">
+              <button onClick={handleLogout} className="btn btn-outline-danger ms-2">
+                Cerrar sesión
+              </button>
+            </li>
+          )}
+
           <li className="nav-item">
             <Link to="/carrito" className="nav-link border rounded px-2">
-              🛒 <span className="ms-1">0</span>
+              🛒 <span className="ms-1">Carrito</span>
             </Link>
           </li>
         </ul>
@@ -56,3 +102,8 @@ export default function Navbar() {
     </nav>
   );
 }
+
+
+
+
+
