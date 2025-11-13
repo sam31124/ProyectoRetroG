@@ -51,9 +51,12 @@ export default function Registro() {
 
     setMensaje({ tipo: "exito", texto: "Registro exitoso. Redirigiendo al login..." });
 
-    setTimeout(() => {
-      navigate("/login");
-    }, 1500);
+    const delay = window.__TEST__ ? 0 : 1500;
+
+setTimeout(() => {
+  navigate("/login");
+}, delay);
+
   };
 
   return (

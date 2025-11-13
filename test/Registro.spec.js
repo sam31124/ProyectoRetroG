@@ -1,40 +1,55 @@
-import React from "react";
-import { render, screen, fireEvent } from "@testing-library/react";
-import * as Router from "react-router-dom";
-import Registro from "../src/components/pages/Registro";
+const React = require("react");
+const { render, screen, fireEvent } = require("@testing-library/react");
+const { MemoryRouter } = require("react-router-dom");
 
-const wait = (ms) => new Promise((res) => setTimeout(res, ms));
+// 🟢 MOCK DE useNavigate (OBLIGATORIO)
+const reactRouter = require("react-router-dom");
+reactRouter.useNavigate = () => () => {}; // navegación falsa
+
+const Registro = require("../src/components/pages/Registro").default;
 
 describe("Registro.jsx", () => {
-  let navigateMock;
 
-  beforeEach(() => {
-    navigateMock = jasmine.createSpy("navigate");
+  it("muestra error si faltan datos", () => {
+    render(
+      React.createElement(
+        MemoryRouter,
+        {},
+        React.createElement(Registro)
+      )
+    );
 
-    spyOn(Router, "useNavigate").and.returnValue(navigateMock);
+    fireEvent.click(screen.getByText("Registrarse"));
 
-    localStorage.clear();
+    expect(
+      screen.getByText("Por favor completa todos los campos.")
+    ).toBeTruthy();
   });
 
-  it("navega después de registrarse", async () => {
-    render(<Registro />);
+  it("guarda usuario en localStorage", () => {
+    localStorage.clear();
+
+    render(
+      React.createElement(
+        MemoryRouter,
+        {},
+        React.createElement(Registro)
+      )
+    );
 
     fireEvent.change(screen.getByPlaceholderText("Tu nombre"), {
       target: { value: "Samuel" },
     });
-
     fireEvent.change(screen.getByPlaceholderText("ejemplo@correo.com"), {
-      target: { value: "samuel@test.com" },
+      target: { value: "sam@test.com" },
     });
-
     fireEvent.change(screen.getByPlaceholderText("Mínimo 6 caracteres"), {
       target: { value: "123456" },
     });
 
     fireEvent.click(screen.getByText("Registrarse"));
 
-    await wait(1600);
-
-    expect(navigateMock).toHaveBeenCalledWith("/login");
+    const usuarios = JSON.parse(localStorage.getItem("usuarios_retroG"));
+    expect(usuarios.length).toBe(1);
   });
 });

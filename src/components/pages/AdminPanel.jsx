@@ -3,6 +3,9 @@ import { useNavigate } from "react-router-dom";
 import * as consolesApi from "../../data/consoles";
 import "../../styles/main.css";
 
+// Importar el contexto
+import { AdminProvider, useAdmin } from "../../context/AdminContext";
+
 // Importar componentes del panel admin
 import Dashboard from "../admin/Dashboard";
 import ProductosAdmin from "../admin/ProductosAdmin";
@@ -11,29 +14,8 @@ import UsuariosAdmin from "../admin/Usuarios";
 import ReportesAdmin from "../admin/Reportes";
 import PerfilAdmin from "../admin/Perfil";
 
-
-export default function AdminPanel() {
-  const navigate = useNavigate();
-  const [usuario, setUsuario] = useState(null);
-  const [vista, setVista] = useState("dashboard");
-  const [consolas, setConsolas] = useState([]);
-
-  useEffect(() => {
-    const user = JSON.parse(localStorage.getItem("usuarioActivo"));
-    if (!user || !user.correo.endsWith("@profesor.cl")) {
-      alert("Acceso denegado. Solo administradores pueden ingresar.");
-      navigate("/login");
-      return;
-    }
-    setUsuario(user);
-    setConsolas(consolesApi.readAll());
-  }, [navigate]);
-
-  const handleLogout = () => {
-    localStorage.removeItem("usuarioActivo");
-    window.dispatchEvent(new Event("storage")); //  fuerza actualización del Navbar
-    navigate("/");
-  };
+function AdminPanelContent({ usuario, consolas, handleLogout }) {
+  const { vista, setVista } = useAdmin();
 
   const renderVista = () => {
     switch (vista) {
@@ -97,5 +79,39 @@ export default function AdminPanel() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function AdminPanel() {
+  const navigate = useNavigate();
+  const [usuario, setUsuario] = useState(null);
+  const [consolas, setConsolas] = useState([]);
+
+  useEffect(() => {
+    const user = JSON.parse(localStorage.getItem("usuarioActivo"));
+    if (!user || !user.correo.endsWith("@profesor.cl")) {
+      alert("Acceso denegado. Solo administradores pueden ingresar.");
+      navigate("/login");
+      return;
+    }
+    setUsuario(user);
+    setConsolas(consolesApi.readAll());
+  }, [navigate]);
+
+  const handleLogout = () => {
+    localStorage.removeItem("usuarioActivo");
+    window.dispatchEvent(new Event("storage"));
+    navigate("/");
+  };
+
+  // Aquí se envuelve el contenido con el provider
+  return (
+    <AdminProvider>
+      <AdminPanelContent
+        usuario={usuario}
+        consolas={consolas}
+        handleLogout={handleLogout}
+      />
+    </AdminProvider>
   );
 }

@@ -1,30 +1,40 @@
-import React, { useEffect, useState } from 'react'; 
-import { Link, useNavigate } from 'react-router-dom';
-import '../../styles/main.css';
+import React, { useEffect, useState } from "react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
+import "../../styles/main.css";
 
 export default function Navbar() {
+  const [usuario, setUsuario] = useState(
+    JSON.parse(localStorage.getItem("usuarioActivo"))
+  );
   const navigate = useNavigate();
-  const [usuario, setUsuario] = useState(null);
+  const location = useLocation();
 
-  // 💫 Actualiza el estado al montar y cuando cambie el localStorage
+  // 🔁 Mantener sincronizado el usuario entre pestañas y después de logout
   useEffect(() => {
-    const handleStorageChange = () => {
+    const actualizarUsuario = () => {
       const user = JSON.parse(localStorage.getItem("usuarioActivo"));
-      setUsuario(user);
+      setUsuario(user || null);
     };
 
-    handleStorageChange(); // carga inicial
-    window.addEventListener("storage", handleStorageChange);
-    return () => window.removeEventListener("storage", handleStorageChange);
-  }, []);
+    // Escucha eventos personalizados y del storage
+    window.addEventListener("usuarioActualizado", actualizarUsuario);
+    window.addEventListener("storage", actualizarUsuario);
 
-  const esAdmin = usuario?.correo?.endsWith("@profesor.cl");
+    return () => {
+      window.removeEventListener("usuarioActualizado", actualizarUsuario);
+      window.removeEventListener("storage", actualizarUsuario);
+    };
+  }, []);
 
   const handleLogout = () => {
     localStorage.removeItem("usuarioActivo");
-    window.dispatchEvent(new Event("storage"));
-    navigate("/login");
+    setUsuario(null);
+    window.dispatchEvent(new Event("usuarioActualizado"));
+    navigate("/");
   };
+
+  const esAdmin = usuario?.correo?.endsWith("@profesor.cl");
+  const estaEnAdmin = location.pathname.startsWith("/admin");
 
   return (
     <nav className="navbar navbar-expand-lg navbar-dark bg-dark px-4">
@@ -46,25 +56,15 @@ export default function Navbar() {
 
       <div className="collapse navbar-collapse justify-content-between" id="navbarNav">
         <ul className="navbar-nav">
-          <li className="nav-item">
-            <Link to="/productos" className="nav-link">Productos</Link>
-          </li>
-          <li className="nav-item">
-            <Link to="/nosotros" className="nav-link">Nosotros</Link>
-          </li>
-          <li className="nav-item">
-            <Link to="/blogs" className="nav-link">Blogs</Link>
-          </li>
-          <li className="nav-item">
-            <Link to="/contacto" className="nav-link">Contacto</Link>
-          </li>
-          <li className="nav-item">
-            <Link to="/ofertas" className="nav-link">Ofertas</Link>
-          </li>
+          <li className="nav-item"><Link to="/productos" className="nav-link">Productos</Link></li>
+          <li className="nav-item"><Link to="/nosotros" className="nav-link">Nosotros</Link></li>
+          <li className="nav-item"><Link to="/blogs" className="nav-link">Blogs</Link></li>
+          <li className="nav-item"><Link to="/contacto" className="nav-link">Contacto</Link></li>
+          <li className="nav-item"><Link to="/ofertas" className="nav-link">Ofertas</Link></li>
         </ul>
 
-        <ul className="navbar-nav">
-          {/* 💖 Si NO hay usuario logueado, mostramos Ingresar/Registro */}
+        <ul className="navbar-nav align-items-center">
+          {/* Mostrar solo si no hay sesión */}
           {!usuario && (
             <>
               <li className="nav-item">
@@ -76,33 +76,41 @@ export default function Navbar() {
             </>
           )}
 
-          {/* 💼 Si es admin, mostramos acceso al panel */}
-          {esAdmin && (
-            <li className="nav-item">
-              <Link to="/admin" className="nav-link text-warning">Panel Admin</Link>
-            </li>
-          )}
-
-          {/* 🚪 Si hay usuario, mostramos botón de cerrar sesión */}
-          {usuario && (
-            <li className="nav-item">
-              <button onClick={handleLogout} className="btn btn-outline-danger ms-2">
-                Cerrar sesión
-              </button>
-            </li>
-          )}
-
+          {/* Carrito siempre visible */}
           <li className="nav-item">
             <Link to="/carrito" className="nav-link border rounded px-2">
               🛒 <span className="ms-1">Carrito</span>
             </Link>
           </li>
+
+          {/* Botón admin */}
+          {esAdmin && !estaEnAdmin && (
+            <li className="nav-item ms-2">
+              <button
+                className="btn btn-outline-warning btn-sm"
+                onClick={() => navigate("/admin")}
+              >
+                Ir al panel admin
+              </button>
+            </li>
+          )}
+
+          {/* Cerrar sesión (para todos los logueados) */}
+          {usuario && (
+            <li className="nav-item ms-2">
+              <button
+                className="btn btn-outline-danger btn-sm"
+                onClick={handleLogout}
+              >
+                Cerrar sesión
+              </button>
+            </li>
+          )}
         </ul>
       </div>
     </nav>
   );
 }
-
 
 
 

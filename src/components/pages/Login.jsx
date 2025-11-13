@@ -34,6 +34,9 @@ export default function Login() {
 
     // Guardar sesión del usuario
     localStorage.setItem("usuarioActivo", JSON.stringify(usuario));
+    window.dispatchEvent(new Event("usuarioActualizado")); // 🔔 notifica al navbar
+    navigate("/");
+
 
     // Verificar si es administrador (correo @profesor.cl)
     if (form.correo.endsWith("@profesor.cl")) {
