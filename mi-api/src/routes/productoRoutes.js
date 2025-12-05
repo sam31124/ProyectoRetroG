@@ -4,7 +4,7 @@ const productoController = require('../controllers/productoController');
 
 /**
  * @swagger
- * /productos:
+ * /api/productos:
  * get:
  * summary: Obtener todos los productos
  * tags: [Productos]
@@ -21,8 +21,9 @@ const productoController = require('../controllers/productoController');
 router.get('/', productoController.getProductos);
 router.post('/', productoController.createProducto);
 
-// Rutas sin documentación por ahora
+// Rutas por ID
 router.get('/:id', productoController.getProductoById);
+router.put('/:id', productoController.updateProducto); // <--- ¡ESTA ES LA QUE FALTABA!
 router.delete('/:id', productoController.deleteProducto);
 
 module.exports = router;

@@ -28,6 +28,16 @@ exports.createProducto = async (req, res) => {
   }
 };
 
+// 👇 ESTA FUNCIÓN FALTABA Y CAUSABA EL ERROR
+exports.updateProducto = async (req, res) => {
+  try {
+    const actualizado = await ProductoModel.update(req.params.id, req.body);
+    res.json(actualizado);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 exports.deleteProducto = async (req, res) => {
   try {
     await ProductoModel.delete(req.params.id);
