@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import AuthService from "../../services/AuthService"; // Importamos el servicio nuevo
 import "../../styles/main.css";
 
 export default function Login() {
@@ -14,49 +15,59 @@ export default function Login() {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setError(""); // Limpiar errores previos
 
     if (!form.correo || !form.password) {
       setError("Por favor, completa todos los campos");
       return;
     }
 
-    const usuarios = JSON.parse(localStorage.getItem("usuarios_retroG")) || [];
-    const usuario = usuarios.find(
-      (u) => u.correo === form.correo && u.password === form.password
-    );
+    try {
+      // 🚀 CONEXIÓN REAL AL BACKEND
+      // Le pasamos (correo, password) al servicio
+      const data = await AuthService.login(form.correo, form.password);
+      
+      // Si llegamos aquí, el login fue exitoso
+      const usuario = data.user;
 
-    if (!usuario) {
-      setError("Correo o contraseña incorrectos");
-      return;
-    }
+      // 🔔 Notificar al Navbar que hubo cambios (Igual que antes)
+      window.dispatchEvent(new Event("usuarioActualizado"));
 
-    // Guardar sesión del usuario
-    localStorage.setItem("usuarioActivo", JSON.stringify(usuario));
-    window.dispatchEvent(new Event("usuarioActualizado")); // 🔔 notifica al navbar
-    navigate("/");
+      // 🚦 LÓGICA DE REDIRECCIÓN POR ROLES (Desde la Base de Datos)
+      if (usuario.rol === 'admin') {
+        alert(`👨‍🏫 Bienvenido Jefe, ${usuario.nombre}!`);
+        navigate("/admin/dashboard"); // O la ruta que tengas para admin
+      } else if (usuario.rol === 'vendedor') {
+        alert(`💼 Turno de ventas iniciado, ${usuario.nombre}.`);
+        navigate("/ventas"); // O donde vean las órdenes
+      } else {
+        alert(`🎮 ¡A jugar! Bienvenido ${usuario.nombre}.`);
+        navigate("/");
+      }
 
-
-    // Verificar si es administrador (correo @profesor.cl)
-    if (form.correo.endsWith("@profesor.cl")) {
-      alert(`👨‍🏫 Bienvenido Administrador, ${usuario.nombre || "Profesor"}!`);
-      navigate("/admin");
-    } else {
-      alert(`🎮 Bienvenido, ${usuario.nombre || "Jugador"}!`);
-      navigate("/");
+    } catch (err) {
+      console.error("Error login:", err);
+      // Si el backend responde error (ej: 401), lo mostramos
+      if (err.response && err.response.status === 401) {
+        setError("Correo o contraseña incorrectos");
+      } else {
+        setError("Error de conexión con el servidor");
+      }
     }
   };
 
   return (
     <div className="container mt-5 text-light">
-      <h2 className="neon-title text-center mb-4"> Iniciar Sesión</h2>
+      <h2 className="neon-title text-center mb-4">Iniciar Sesión (Real)</h2>
       <form
         onSubmit={handleSubmit}
         className="border-neon p-4 bg-dark rounded mx-auto"
         style={{ maxWidth: "400px" }}
       >
-        {error && <p className="text-danger text-center">{error}</p>}
+        {error && <div className="alert alert-danger text-center">{error}</div>}
+        
         <div className="mb-3">
           <label className="form-label">Correo</label>
           <input
@@ -65,7 +76,7 @@ export default function Login() {
             value={form.correo}
             onChange={handleChange}
             className="form-control"
-            placeholder="tuemail@ejemplo.com"
+            placeholder="cliente@tienda.com"
           />
         </div>
         <div className="mb-3">
@@ -80,6 +91,7 @@ export default function Login() {
           />
         </div>
         <button className="btn btn-info w-100">Iniciar sesión</button>
+        
         <p className="mt-3 text-center">
           ¿No tienes cuenta?{" "}
           <span

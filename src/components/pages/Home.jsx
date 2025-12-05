@@ -1,12 +1,24 @@
-import React from 'react';
-import { useConsole } from '../../context/ConsoleContext';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import ConsoleCard from '../molecules/ConsoleCard';
+// 👇 AQUÍ ESTABA EL ERROR, AHORA ESTÁ CORREGIDO
+import ConsoleCard from '../molecules/ConsoleCard'; 
+import ProductoService from '../../services/ProductoService';
 import '../../styles/main.css';
 
 export default function Home() {
-  const { consoles } = useConsole();
   const navigate = useNavigate();
+  const [consoles, setConsoles] = useState([]);
+
+  useEffect(() => {
+    ProductoService.getAllProductos()
+      .then((response) => {
+        console.log("Datos de AWS:", response.data);
+        setConsoles(response.data);
+      })
+      .catch((error) => {
+        console.error("Error conectando al backend:", error);
+      });
+  }, []);
 
   return (
     <div className="text-center">
@@ -23,7 +35,7 @@ export default function Home() {
             </p>
             <button
               className="btn btn-primary mt-3 border-neon"
-              onClick={() => navigate('/productos')} // 👈 Ajusta esta ruta si tus productos están en otra página
+              onClick={() => navigate('/productos')}
             >
               Ver productos
             </button>
@@ -34,6 +46,7 @@ export default function Home() {
               alt="Tienda Retro"
               className="img-fluid border-neon"
               style={{ borderRadius: '10px', maxHeight: '280px', objectFit: 'cover' }}
+              onError={(e) => { e.target.style.display = 'none'; }} // Oculta si falla la imagen
             />
           </div>
         </div>
@@ -41,7 +54,10 @@ export default function Home() {
 
       {/* 🔹 Sección de productos */}
       <section className="container mt-5">
-        <h2 className="neon-title mb-4">Nuestros Productos</h2>
+        <h2 className="neon-title mb-4">Nuestros Productos (Desde AWS)</h2>
+        
+        {consoles.length === 0 && <p className="text-light">Cargando datos del servidor...</p>}
+
         <div className="row justify-content-center">
           {consoles.map((c) => (
             <div key={c.id} className="col-12 col-sm-6 col-md-4 col-lg-3 mb-4">
@@ -53,4 +69,3 @@ export default function Home() {
     </div>
   );
 }
-

@@ -1,77 +1,48 @@
-import React from "react";
-import { Link } from "react-router-dom";
-import { readAll } from "../../data/consoles";
-import { useCart } from "../../context/CartContext";
-import "../../styles/main.css";
+import React, { useState, useEffect } from 'react';
+import ConsoleCard from '../molecules/ConsoleCard';
+import ProductoService from '../../services/ProductoService'; // 👇 Importamos el servicio real
+import '../../styles/main.css';
 
 export default function Productos() {
-  const productos = readAll();
-  const { addToCart } = useCart();
+  const [consoles, setConsoles] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const agregarAlCarrito = (p) => {
-    const producto = {
-      id: p.id,
-      name: p.name,
-      price: Number(p.price || 0),
-      image: p.image,
-    };
-
-    const carrito = JSON.parse(localStorage.getItem("carrito")) || [];
-    const existe = carrito.find((i) => i.id === producto.id);
-
-    let nuevo;
-    if (existe) {
-      nuevo = carrito.map((i) =>
-        i.id === producto.id ? { ...i, cantidad: i.cantidad + 1 } : i
-      );
-    } else {
-      nuevo = [...carrito, { ...producto, cantidad: 1 }];
-    }
-
-    localStorage.setItem("carrito", JSON.stringify(nuevo));
-    window.dispatchEvent(new Event("storage"));
-    addToCart(producto);
-
-    alert(`🎮 ${producto.name} agregado al carrito`);
-  };
+  useEffect(() => {
+    // 📡 Pedir datos a AWS
+    ProductoService.getAllProductos()
+      .then((response) => {
+        setConsoles(response.data);
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.error("Error al cargar el catálogo:", error);
+        setLoading(false);
+      });
+  }, []);
 
   return (
-    <div className="container mt-5 text-light">
-      <h2 className="neon-title text-center mb-4">Nuestros Productos</h2>
+    <div className="container mt-5">
+      <h2 className="neon-title text-center mb-4">Catálogo Completo</h2>
+      
+      {/* Mensaje de carga */}
+      {loading && (
+        <div className="text-center text-info">
+          <div className="spinner-border" role="status"></div>
+          <p>Cargando inventario desde la nube...</p>
+        </div>
+      )}
 
-      <div className="row">
-        {productos.map((p) => (
-          <div key={p.id} className="col-6 col-md-4 col-lg-3 mb-4">
+      {/* Mensaje si no hay productos */}
+      {!loading && consoles.length === 0 && (
+        <p className="text-center text-muted">No hay productos disponibles en este momento.</p>
+      )}
 
-            <div className="card bg-dark text-light border-neon h-100 text-center p-2">
-
-              {/* 🟦 NAVEGACIÓN AL DETALLE */}
-              <Link
-                to={`/producto/${p.id}`}
-                className="text-decoration-none text-light"
-              >
-                <img
-                  src={p.image}
-                  alt={p.name}
-                  className="card-img-top"
-                  style={{ height: "150px", objectFit: "cover" }}
-                />
-                <div className="card-body">
-                  <h6>{p.name}</h6>
-                  <p>${Number(p.price).toLocaleString()}</p>
-                </div>
-              </Link>
-
-              {/* 🟩 BOTÓN DEL CARRITO */}
-              <button
-                className="btn btn-outline-info btn-sm w-100"
-                onClick={() => agregarAlCarrito(p)}
-              >
-                Agregar al carrito
-              </button>
-
-            </div>
-
+      {/* Grilla de Productos */}
+      <div className="row justify-content-center">
+        {consoles.map((c) => (
+          <div key={c.id} className="col-12 col-sm-6 col-md-4 col-lg-3 mb-4">
+            {/* ConsoleCard ya es inteligente y lee los datos de la BD */}
+            <ConsoleCard consoleItem={c} />
           </div>
         ))}
       </div>

@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import * as consolesApi from "../../data/consoles";
 import "../../styles/main.css";
 
-// Importar el contexto
+// 👇 1. Usamos el servicio REAL (AWS) en vez de datos locales
+import ProductoService from "../../services/ProductoService"; 
+
+// Importar el contexto (Asegúrate de que este archivo exista, si no, avísame)
 import { AdminProvider, useAdmin } from "../../context/AdminContext";
 
 // Importar componentes del panel admin
@@ -18,21 +20,15 @@ function AdminPanelContent({ usuario, consolas, handleLogout }) {
   const { vista, setVista } = useAdmin();
 
   const renderVista = () => {
+    // Pasamos las consolas reales a los componentes
     switch (vista) {
-      case "dashboard":
-        return <Dashboard />;
-      case "productos":
-        return <ProductosAdmin consolas={consolas} />;
-      case "categorias":
-        return <CategoriasAdmin consolas={consolas} />;
-      case "usuarios":
-        return <UsuariosAdmin />;
-      case "reportes":
-        return <ReportesAdmin consolas={consolas} />;
-      case "perfil":
-        return <PerfilAdmin usuario={usuario} />;
-      default:
-        return <Dashboard />;
+      case "dashboard": return <Dashboard />;
+      case "productos": return <ProductosAdmin consolas={consolas} />;
+      case "categorias": return <CategoriasAdmin consolas={consolas} />;
+      case "usuarios": return <UsuariosAdmin />;
+      case "reportes": return <ReportesAdmin consolas={consolas} />;
+      case "perfil": return <PerfilAdmin usuario={usuario} />;
+      default: return <Dashboard />;
     }
   };
 
@@ -54,16 +50,13 @@ function AdminPanelContent({ usuario, consolas, handleLogout }) {
               ].map(([label, key]) => (
                 <button
                   key={key}
-                  className="btn btn-outline-info w-100 mb-2"
+                  className={`btn w-100 mb-2 text-start ${vista === key ? 'btn-info' : 'btn-outline-info'}`}
                   onClick={() => setVista(key)}
                 >
                   {label}
                 </button>
               ))}
-              <button
-                className="btn btn-danger w-100 mt-3"
-                onClick={handleLogout}
-              >
+              <button className="btn btn-danger w-100 mt-3" onClick={handleLogout}>
                 🚪 Cerrar sesión
               </button>
             </li>
@@ -73,7 +66,7 @@ function AdminPanelContent({ usuario, consolas, handleLogout }) {
         {/* Contenido principal */}
         <div className="col-md-9 col-lg-10">
           <h2 className="neon-title text-center mb-4">
-            Bienvenido, {usuario?.nombre || "Administrador"}
+            Bienvenido, {usuario?.nombre || "Jefe"}
           </h2>
           {renderVista()}
         </div>
@@ -88,23 +81,37 @@ export default function AdminPanel() {
   const [consolas, setConsolas] = useState([]);
 
   useEffect(() => {
-    const user = JSON.parse(localStorage.getItem("usuarioActivo"));
-    if (!user || !user.correo.endsWith("@profesor.cl")) {
-      alert("Acceso denegado. Solo administradores pueden ingresar.");
+    // 1. Verificar Usuario
+    const userStored = JSON.parse(localStorage.getItem("usuarioActivo"));
+    
+    // 🔒 VALIDACIÓN NUEVA: Usamos el ROL, no el correo
+    if (!userStored || userStored.rol !== 'admin') {
+      alert("⛔ Acceso denegado. Se requiere rol de Administrador.");
       navigate("/login");
       return;
     }
-    setUsuario(user);
-    setConsolas(consolesApi.readAll());
+    
+    setUsuario(userStored);
+
+    // 2. Cargar Datos Reales de AWS
+    ProductoService.getAllProductos()
+      .then(response => {
+        console.log("Datos cargados en Admin:", response.data);
+        setConsolas(response.data);
+      })
+      .catch(error => {
+        console.error("Error cargando productos para admin:", error);
+      });
+
   }, [navigate]);
 
   const handleLogout = () => {
     localStorage.removeItem("usuarioActivo");
-    window.dispatchEvent(new Event("storage"));
+    localStorage.removeItem("token"); // Borrar token también
+    window.dispatchEvent(new Event("usuarioActualizado"));
     navigate("/");
   };
 
-  // Aquí se envuelve el contenido con el provider
   return (
     <AdminProvider>
       <AdminPanelContent

@@ -6,7 +6,12 @@
     "@testing-library/dom": "^10.4.1",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/user-event": "^13.5.0",
+    "axios": "^1.13.2",
     "bootstrap": "^5.3.8",
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.0",
+    "express": "^5.1.0",
+    "pg": "^8.11.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-icons": "^5.5.0",
@@ -52,8 +57,17 @@
     "karma-edge-launcher": "^0.4.2",
     "karma-jasmine": "^5.1.0",
     "karma-webpack": "^5.0.1",
+    "nodemon": "^3.1.11",
     "style-loader": "^4.0.0",
     "webpack": "^5.102.1",
     "webpack-cli": "^6.0.1"
-  }
+  },
+  "description": "This project was bootstrapped with Create React App.",
+  "main": "karma.conf.js",
+  "directories": {
+    "test": "test"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
 }

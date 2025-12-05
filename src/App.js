@@ -21,15 +21,11 @@ import Registro from './components/pages/Registro';
 import Login from './components/pages/Login';
 import ProductoDetalle from "./components/pages/ProductoDetalle";
 
-
-
 import Navbar from './components/organisms/Navbar';
 import Footer from './components/organisms/Footer';
 
 import './styles/main.css';
 import './App.css';
-
-
 
 export default function App() {
   return (
@@ -39,20 +35,31 @@ export default function App() {
           <Navbar />
           <main className="container py-5">
             <Routes>
+              {/* Rutas Públicas */}
               <Route path="/" element={<Home />} />
               <Route path="/productos" element={<Productos />} />
               <Route path="/ofertas" element={<Ofertas />} />
+              <Route path="/nosotros" element={<Nosotros />} />
+              <Route path="/contacto" element={<Contacto />} />
+              <Route path="/blogs" element={<Blogs />} />
+              
+              {/* Carrito y Compras */}
               <Route path="/carrito" element={<Carrito />} />
               <Route path="/checkout" element={<Checkout />} />
-              <Route path="/nosotros" element={<Nosotros />} />
               <Route path="/exito" element={<CompraExitosa />} />
               <Route path="/error" element={<CompraError />} />
-              <Route path="/admin" element={<AdminPanel />} />
-              <Route path="/blogs" element={<Blogs />} />
-              <Route path="/contacto" element={<Contacto />} />
+              
+              {/* Usuarios */}
               <Route path="/registro" element={<Registro />} />
               <Route path="/login" element={<Login />} />
               <Route path="/producto/:id" element={<ProductoDetalle />} />
+
+              {/* 🔒 Panel de Admin (Ruta corregida) */}
+              <Route path="/admin/dashboard" element={<AdminPanel />} />
+              
+              {/* Ruta para vendedores (reutilizamos Productos por ahora) */}
+              <Route path="/ventas" element={<Productos />} />
+
             </Routes>
           </main>
           <Footer />
