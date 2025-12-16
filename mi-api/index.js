@@ -25,7 +25,27 @@ app.get('/', (req, res) => {
   res.send('API Funcionando correctamente 🚀. Ve a /api-docs para ver la documentación.');
 });
 
+// ... (Tus rutas de arriba)
+
+// 👇 AGREGA ESTO AL FINAL, ANTES DEL LISTEN:
+app.use((req, res, next) => {
+    console.log(`👀 PETICIÓN RECIBIDA: ${req.method} ${req.originalUrl}`);
+    res.status(404).json({ error: "Ruta no encontrada, revisa el log" });
+});
+
 // Arrancar Servidor
 app.listen(PORT, '0.0.0.0', () => {
-  console.log(`✅ Servidor corriendo en puerto ${PORT}`);
+    console.log(`✅ Servidor corriendo en puerto ${PORT}`);
 });
+
+// ... todo tu código anterior ...
+
+// CAMBIA EL FINAL POR ESTO:
+
+if (require.main === module) {
+    app.listen(PORT, '0.0.0.0', () => {
+        console.log(`✅ Servidor corriendo en puerto ${PORT}`);
+    });
+}
+
+module.exports = app; // 👈 ESTO ES LO IMPORTANTE PARA EL TEST

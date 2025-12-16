@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import AuthService from "../../services/AuthService"; // 1. Importamos el servicio
 import "../../styles/main.css";
 
 export default function Registro() {
@@ -18,11 +19,13 @@ export default function Registro() {
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleSubmit = (e) => {
+  // 2. Convertimos la función a ASYNC para esperar al servidor
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const { nombre, correo, password } = formData;
+    setMensaje({ tipo: "", texto: "" });
 
-    // Validación
+    // Validación básica
     if (!nombre || !correo || !password) {
       setMensaje({ tipo: "error", texto: "Por favor completa todos los campos." });
       return;
@@ -33,35 +36,34 @@ export default function Registro() {
       return;
     }
 
-    // Cargar usuarios existentes
-    const usuarios = JSON.parse(localStorage.getItem("usuarios_retroG")) || [];
+    try {
+      // 3. Determinar rol (Lógica de negocio)
+      const rol = correo.endsWith("@profesor.cl") ? "admin" : "cliente";
 
-    // Verificar duplicado
-    if (usuarios.find(u => u.correo === correo)) {
-      setMensaje({ tipo: "error", texto: "Ya existe un usuario con ese correo." });
-      return;
+      // 4. ENVÍO REAL AL BACKEND (Adiós LocalStorage)
+      await AuthService.register(nombre, correo, password, rol);
+
+      // Si no hay error, mostramos éxito
+      setMensaje({ tipo: "exito", texto: "Registro exitoso en la Base de Datos. Redirigiendo..." });
+
+      setTimeout(() => {
+        navigate("/login");
+      }, 1500);
+
+    } catch (error) {
+      console.error("Error en registro:", error);
+      // Si el backend dice que ya existe
+      if (error.response && error.response.status === 400) {
+         setMensaje({ tipo: "error", texto: "Este correo ya está registrado." });
+      } else {
+         setMensaje({ tipo: "error", texto: "Error al conectar con el servidor." });
+      }
     }
-
-    // Asignar rol
-    const rol = correo.endsWith("@profesor.cl") ? "admin" : "cliente";
-
-    const nuevoUsuario = { nombre, correo, password, rol };
-    usuarios.push(nuevoUsuario);
-    localStorage.setItem("usuarios_retroG", JSON.stringify(usuarios));
-
-    setMensaje({ tipo: "exito", texto: "Registro exitoso. Redirigiendo al login..." });
-
-    const delay = window.__TEST__ ? 0 : 1500;
-
-setTimeout(() => {
-  navigate("/login");
-}, delay);
-
   };
 
   return (
     <div className="container mt-5 text-light">
-      <h2 className="text-center mb-4 neon-title"> Registro de Usuario</h2>
+      <h2 className="text-center mb-4 neon-title">Registro de Usuario (Real)</h2>
 
       <form
         onSubmit={handleSubmit}
@@ -115,7 +117,7 @@ setTimeout(() => {
         )}
 
         <button type="submit" className="btn btn-primary w-100 mt-3 border-neon">
-          Registrarse 
+          Registrarse
         </button>
       </form>
     </div>

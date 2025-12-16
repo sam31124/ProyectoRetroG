@@ -1,21 +1,36 @@
-import api from './AxiosConfig'; // Reutilizamos la config base
+import axios from 'axios'; // 1. Usamos axios directo, no la config
+
+// LA URL COMPLETA Y EXPLICITA (A prueba de fallos)
+const API_URL = "http://52.7.131.177:4000/api/auth"; 
 
 class AuthService {
     
-    // Iniciar Sesión
+    // 1. INICIAR SESIÓN
     async login(usuario, password) {
-        // La ruta completa será: http://18.204.17.94:4000/api/auth/login
-        const response = await api.post('/auth/login', { email: usuario, password });
+        console.log("🔵 Intentando login en:", API_URL + '/login');
+        
+        // Usamos axios.post directo con la dirección completa
+        const response = await axios.post(API_URL + '/login', { 
+            email: usuario, // Tu backend espera 'email', tu front manda 'correo' -> Aquí lo mapeamos
+            password: password 
+        });
         
         if (response.data.token) {
             localStorage.setItem('token', response.data.token);
-            // También guardamos el usuario para mostrar el nombre
             localStorage.setItem('usuarioActivo', JSON.stringify(response.data.user));
         }
         return response.data;
     }
 
-    // Cerrar Sesión
+    // 2. REGISTRAR USUARIO
+    async register(nombre, email, password, rol) {
+        const response = await axios.post(API_URL + '/register', { 
+            nombre, email, password, rol 
+        });
+        return response.data;
+    }
+
+    // 3. LOGOUT
     logout() {
         localStorage.removeItem('token');
         localStorage.removeItem('usuarioActivo');
